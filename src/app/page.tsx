@@ -13,13 +13,6 @@ const navLinks = [
   { label: "Contact", href: "#contact" },
 ];
 
-const spotlightStats = [
-  { label: "GPA", value: "3.53 / 4.00" },
-  { label: "Security", value: "Active Secret Clearance" },
-  { label: "Location", value: "Scarsdale, NY" },
-  { label: "Focus", value: "Full-stack + Systems" },
-];
-
 const experiences = [
   {
     role: "Software Engineer Intern",
@@ -216,13 +209,10 @@ export default function Home() {
       <main className='relative mx-auto flex w-full max-w-7xl flex-col gap-14 px-4 pb-32 pt-6 sm:px-8 lg:px-12'>
         <div className='grid-lines rounded-[40px]' aria-hidden />
 
-        <header className='site-header'>
+        <header className='site-header initial-visible'>
           <div>
             <p className='text-sm uppercase tracking-[0.4em] text-white/60'>
               Benjamin Zlatin
-            </p>
-            <p className='text-base text-white/85'>
-              CS @ University of Delaware · SWE / Systems
             </p>
           </div>
           <nav className='nav-links'>
@@ -245,7 +235,7 @@ export default function Home() {
 
         <AnimatedSection
           id='hero'
-          className='glass-panel hero-panel relative overflow-hidden'
+          className='glass-panel hero-panel relative overflow-hidden initial-visible'
           alwaysVisible
         >
           <div className='hero-orb hero-orb--left' aria-hidden />
@@ -256,7 +246,7 @@ export default function Home() {
               <span className='section-eyebrow'>
                 CS @ University of Delaware · Seeking Summer 2026 SWE Roles
               </span>
-              <h1 className='text-3xl font-semibold leading-tight text-white sm:text-4xl lg:text-5xl'>
+              <h1 className='hero-title text-3xl font-semibold leading-tight sm:text-4xl lg:text-5xl'>
                 Hi, I’m Ben—full-stack engineer who likes fast systems, clear
                 UX, and proving ideas with code.
               </h1>
@@ -286,6 +276,32 @@ export default function Home() {
                     {link.label} ↗
                   </a>
                 ))}
+              </div>
+              <div id='about' className='about-card space-y-4'>
+                <div className='flex flex-wrap items-center gap-3'>
+                  <p className='section-eyebrow mb-0'>About</p>
+                  <span className='about-pill'>CS ’26 · UD</span>
+                  <span className='about-pill'>Enterprise Neurosystem</span>
+                </div>
+                <p className='text-white/80'>
+                  University of Delaware CS ’26. When I’m not coding I’m
+                  producing music, lifting, hiking, snowboarding, or wake
+                  surfing.
+                </p>
+                <div className='about-pills'>
+                  {coursework.map((course) => (
+                    <span key={course} className='about-pill'>
+                      {course}
+                    </span>
+                  ))}
+                </div>
+                <div className='grid gap-2 sm:grid-cols-2'>
+                  {funNotes.map((note) => (
+                    <p key={note} className='about-note'>
+                      {note}
+                    </p>
+                  ))}
+                </div>
               </div>
             </div>
             <div className='space-y-8'>
@@ -327,58 +343,6 @@ export default function Home() {
                 </p>
               </div>
             </div>
-          </div>
-        </AnimatedSection>
-
-        <AnimatedSection
-          id='about'
-          className='section-card grid gap-8 p-7 md:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] md:items-start'
-        >
-          <div>
-            <p className='section-eyebrow'>About</p>
-            <h2 className='section-heading'>
-              Who I am when I’m not debugging.
-            </h2>
-            <p className='section-subtitle'>
-              University of Delaware CS ’26. When I’m not coding I’m producing
-              music, lifting at the gym, hiking, snowboarding, or wake surfing.
-            </p>
-            <div className='mt-6 space-y-4'>
-              <div className='outline-card'>
-                <p className='text-xs uppercase tracking-[0.3em] text-white/60'>
-                  Coursework highlights
-                </p>
-                <div className='mt-3 flex flex-wrap gap-2'>
-                  {coursework.map((course) => (
-                    <span
-                      key={course}
-                      className='rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs text-white/80'
-                    >
-                      {course}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <div className='outline-card space-y-2'>
-                {funNotes.map((note) => (
-                  <p key={note} className='text-sm text-white/80'>
-                    • {note}
-                  </p>
-                ))}
-              </div>
-            </div>
-          </div>
-          <div className='space-y-4'>
-            {spotlightStats.map((stat) => (
-              <div key={stat.label} className='list-card'>
-                <p className='text-xs uppercase tracking-[0.3em] text-white/60'>
-                  {stat.label}
-                </p>
-                <p className='mt-2 text-lg font-semibold text-white'>
-                  {stat.value}
-                </p>
-              </div>
-            ))}
           </div>
         </AnimatedSection>
 
