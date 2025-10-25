@@ -290,8 +290,6 @@ const ProjectCard = ({
       <div className='mt-auto pt-4'>
         <Link
           href={project.href}
-          target='_blank'
-          rel='noopener noreferrer'
           className='glass-action inline-flex w-full items-center justify-between rounded-2xl border border-white/15 px-4 py-2.5 text-sm font-semibold text-white transition hover:border-white/35'
         >
           <span>Learn more</span>
