@@ -1,96 +1,106 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-const techStack = ["React", "TypeScript", "OpenAI API", "Vite", "Tailwind CSS"];
+const stack = ["React", "TypeScript", "OpenAI API", "Supabase", "Tailwind"];
 
-const features = [
-  "Career quiz that captures interests, skills, and preferred work styles.",
-  "OpenAI-powered feed that explains why each role fits and how to level up.",
-  "Admin panel for our team to tweak question weights without redeploying.",
-  "Sprint board + analytics so we could track adoption during campus demos.",
+const problem = [
+  "Freshmen on campus needed direction on internships and clubs.",
+  "Our team required a consistent sprint rhythm to keep momentum.",
 ];
 
-const challenges = [
-  "Coordinating a six-person student team while juggling other coursework.",
-  "Designing prompts that feel personal but stay affordable per quiz.",
-  "Building feedback loops (thumbs up/down + qualitative notes) so we knew what to iterate.",
+const build = [
+  "Quiz engine that captures interests and routes to AI-personalized feeds.",
+  "Prompt templates plus logging so we could review outputs with mentors.",
+  "Admin tools that let non-engineers tweak question weights without redeploys.",
 ];
 
-const learnings = [
-  "Being Scrum Master forced me to over-communicate blockers and ship smaller slices.",
-  "Good release notes earn you test users—people actually showed up to try the app.",
-  "Logging prompt input/output is essential when non-engineers are tuning copy.",
+const outcome = [
+  "Six-person team shipped weekly; we demoed working features every Friday.",
+  "Students received next-step suggestions with reason codes, not vague ideas.",
 ];
 
 export const metadata: Metadata = {
   title: "StarterHelpi — Project Details",
-  description: "Behind the scenes of StarterHelpi, our AI-guided career quiz and personalized feed.",
+  description: "How we built StarterHelpi, an AI-assisted career quiz for campus demos.",
 };
 
 export default function StarterHelpiPage() {
   return (
-    <div className='relative min-h-screen overflow-hidden page-shell'>
+    <div className='detail-shell relative min-h-screen overflow-hidden'>
       <div className='noise-overlay' aria-hidden />
-      <main className='mx-auto flex w-full max-w-4xl flex-col gap-10 px-4 pb-16 pt-14 sm:px-8'>
-        <section className='glass-panel space-y-5 p-8'>
-          <p className='section-eyebrow'>Project Deep Dive</p>
+      <main className='mx-auto flex w-full max-w-4xl flex-col gap-8 px-4 pb-16 pt-20 sm:px-6'>
+        <header className='detail-panel space-y-6 p-8'>
+          <p className='text-xs uppercase tracking-[0.45em] text-white/50'>Project</p>
           <h1 className='text-4xl font-semibold text-white'>StarterHelpi</h1>
-          <p className='section-subtitle'>
-            A campus-built career quiz that pairs personality-style questions with AI-generated suggestions, built to help
-            freshmen discover internships and communities faster.
+          <p className='text-base text-white/75'>
+            Campus career quiz that pairs quick personality questions with AI-generated suggestions.
           </p>
-          <div className='flex flex-wrap gap-3 text-sm text-white/80'>
-            {techStack.map((item) => (
-              <span key={item} className='rounded-full border border-white/20 px-3 py-1'>
-                {item}
-              </span>
-            ))}
+          <div className='grid gap-4 sm:grid-cols-2'>
+            <div>
+              <p className='text-xs uppercase tracking-[0.35em] text-white/50'>Role</p>
+              <p className='text-sm text-white/80'>Full-stack + Scrum Master</p>
+            </div>
+            <div>
+              <p className='text-xs uppercase tracking-[0.35em] text-white/50'>Timeline</p>
+              <p className='text-sm text-white/80'>2023</p>
+            </div>
+            <div className='sm:col-span-2'>
+              <p className='text-xs uppercase tracking-[0.35em] text-white/50'>Stack</p>
+              <div className='mt-2 flex flex-wrap gap-2 text-xs text-white/75'>
+                {stack.map((item) => (
+                  <span key={item} className='rounded-full border border-white/15 px-3 py-1'>
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
-        </section>
+        </header>
 
-        <section className='section-card space-y-4 p-7'>
-          <h2 className='section-heading text-2xl'>Features</h2>
-          <ul className='space-y-3 text-white/80'>
-            {features.map((item) => (
-              <li key={item}>• {item}</li>
-            ))}
-          </ul>
+        <section className='detail-panel grid gap-6 p-8 md:grid-cols-2'>
+          <article>
+            <p className='text-xs uppercase tracking-[0.35em] text-white/50'>Problem</p>
+            <ul className='mt-3 space-y-2 text-sm text-white/75'>
+              {problem.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </article>
+          <article>
+            <p className='text-xs uppercase tracking-[0.35em] text-white/50'>What I built</p>
+            <ul className='mt-3 space-y-2 text-sm text-white/75'>
+              {build.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </article>
+          <article className='md:col-span-2'>
+            <p className='text-xs uppercase tracking-[0.35em] text-white/50'>Outcome</p>
+            <ul className='mt-3 space-y-2 text-sm text-white/75'>
+              {outcome.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </article>
         </section>
-
-        <section className='section-card space-y-4 p-7'>
-          <h2 className='section-heading text-2xl'>Challenges</h2>
-          <ul className='space-y-3 text-white/80'>
-            {challenges.map((item) => (
-              <li key={item}>• {item}</li>
-            ))}
-          </ul>
-        </section>
-
-        <section className='section-card space-y-4 p-7'>
-          <h2 className='section-heading text-2xl'>Learnings</h2>
-          <ul className='space-y-3 text-white/80'>
-            {learnings.map((item) => (
-              <li key={item}>• {item}</li>
-            ))}
-          </ul>
-        </section>
-
-        <section className='section-card space-y-4 p-7'>
-          <h2 className='section-heading text-2xl'>Links</h2>
+        <section className='detail-panel space-y-4 p-8'>
+          <p className='text-xs uppercase tracking-[0.35em] text-white/50'>Links</p>
           <div className='flex flex-wrap gap-3'>
             <Link
               href='https://bzlatin.github.io/starter_helpi/#/home'
               target='_blank'
-              rel='noreferrer'
+              rel='noopener noreferrer'
               className='inline-flex items-center gap-2 rounded-full bg-white px-5 py-2 text-sm font-semibold text-slate-900'
             >
-              Live Demo ↗
+              Demo ↗
             </Link>
             <Link
-              href='mailto:btzlatin@gmail.com'
+              href='https://github.com/bzlatin/starter_helpi'
+              target='_blank'
+              rel='noopener noreferrer'
               className='inline-flex items-center gap-2 rounded-full border border-white/30 px-5 py-2 text-sm font-semibold text-white'
             >
-              Request presentation ↗
+              GitHub ↗
             </Link>
           </div>
         </section>

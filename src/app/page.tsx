@@ -2,497 +2,692 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useRef,
+  useState,
+  type MouseEvent,
+  type ReactNode,
+} from "react";
+import {
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from "framer-motion";
 
 const navLinks = [
   { label: "Intro", href: "#hero" },
-  { label: "About", href: "#about" },
-  { label: "Experience", href: "#experience" },
   { label: "Projects", href: "#projects" },
-  { label: "Stats", href: "#stats" },
+  { label: "Experience", href: "#experience" },
+  { label: "Skills", href: "#skills" },
   { label: "Contact", href: "#contact" },
+];
+
+const heroContacts = [
+  { label: "GitHub", href: "https://github.com/bzlatin" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/benjamin-zlatin/" },
+  { label: "Email", href: "mailto:btzlatin@gmail.com" },
+];
+
+const projects = [
+  {
+    title: "UD CIS Discord Bot",
+    impact:
+      "4,000+ students pull class schedules, calendars, and alerts inside Discord.",
+    stack: ["Node.js", "MongoDB", "Discord.js", "Google OAuth"],
+    href: "/projects/ud-cis-bot",
+  },
+  {
+    title: "StudyGuider",
+    impact:
+      "Turns 200-slide decks into notes, flashcards, and quizzes for faster studying.",
+    stack: ["Next.js", "NestJS", "Prisma", "OpenAI"],
+    href: "/projects/studyguider",
+    meta: "2025 · In progress", // StudyGuider tag surfaces that this build is still underway.
+  },
+  {
+    title: "StarterHelpi",
+    impact:
+      "Scrum Master of AI career quiz shipped in weekly increments by a 6-person team.",
+    stack: ["React", "TypeScript", "OpenAI API"],
+    href: "/projects/starterhelpi",
+  },
+  {
+    title: "FoodHunt",
+    impact:
+      "Friend groups agree on dinner in under 2 minutes with 50+ recs per session.",
+    stack: ["React", "Express", "MongoDB", "Yelp API"],
+    href: "/projects/foodhunt",
+  },
 ];
 
 const experiences = [
   {
     role: "Software Engineer Intern",
     org: "SciTec · Missile Defense",
-    period: "May 2025 — Aug 2025",
+    period: "May–Aug 2025",
     bullets: [
-      "Parallelized physics-based trajectory sims, cutting runtime 75% (40 min → 10).",
-      "Analyzed 12 interceptor parameters across 7 scenarios; surfaced sensitivities that influenced architecture calls.",
-      "Built Python tooling to visualize missile trajectories and share insights with senior engineers.",
+      "Parallelized intercept simulations and dropped runtime from 40 to 10 minutes.",
+      "Shipped quick-look plots so analysts could review data right after a run.",
     ],
   },
   {
-    role: "UD Senior Design",
-    org: "IBM + Enterprise Neurosystem (NLIP)",
-    period: "Sep 2025 — Present",
+    role: "Senior Design — IBM + Enterprise Neurosystem",
+    org: "University of Delaware",
+    period: "Sep 2025 – Present",
     bullets: [
-      "Co-leading a senior design team building NLIP-compliant AI agents for IBM via the open-source NLIP server.",
-      "Owning the backend for agent APIs + NLIP orchestration while running agile sprints with a five-person team.",
-      "Documenting findings with the Enterprise Neurosystem community; integrating feedback weekly.",
+      "Building NLIP-compliant agent APIs and evaluation hooks for IBM research mentors.",
+      "Bi-weekly sprints for a five-person team.",
     ],
   },
   {
     role: "Software Developer",
-    org: "University of Delaware CIS",
-    period: "Feb 2025 — May 2025",
+    org: "UD CIS Department",
+    period: "Feb–May 2025",
     bullets: [
-      "Maintained the UD CIS Discord Bot used by 4K+ students/faculty with Google OAuth + MongoDB.",
-      "Shipped a calendar feature ingesting official course data so students can access schedules inside Discord.",
+      "Maintained the CIS Discord bot serving 4,000+ students with Google OAuth and MongoDB.",
+      "Launched course calendars and reminders so students don’t miss schedule changes.",
     ],
   },
   {
     role: "Full Stack SWE Intern",
     org: "EmberQA (RingFlare)",
-    period: "May 2022 — Aug 2023",
+    period: "May 2022 – Aug 2023",
     bullets: [
-      "Delivered React, Node.js, and Electron apps that keep 900+ facilities aligned.",
-      "Rebuilt onboarding to reduce client training from 3 weeks to 5 hours.",
-      "Crafted SQL utilities that boosted the accuracy of live call-center reports.",
+      "Delivered React/Electron tools used by 900+ facilities for audits and reporting.",
+      "Rebuilt onboarding to cut client training from 3 weeks to 5 hours.",
     ],
   },
 ];
 
-const projects = [
+const skillGroups = [
   {
-    title: "StudyGuider",
-    stack: ["Next.js", "NestJS", "Prisma", "OpenAI"],
-    summary:
-      "Uploads PDFs/slide decks and generates concise study notes with citations using an AI-powered summarization engine.",
-    outcome: "Cut study prep from hours to minutes for students.",
-    href: "/projects/studyguider",
+    label: "Core stack",
+    items: [
+      "TypeScript",
+      "React / Next.js",
+      "Node.js / NestJS",
+      "Postgres / Prisma",
+    ],
   },
   {
-    title: "StarterHelpi",
-    stack: ["React", "OpenAI API", "TypeScript"],
-    summary:
-      "Career quiz experience with AI-personalized feeds; I acted as Scrum Master overseeing agile cadences and delivery.",
-    outcome:
-      "Kept a 6-person team shipping weekly while tailoring quiz outcomes.",
-    href: "/projects/starterhelpi",
+    label: "Systems & performance",
+    items: ["Python", "C++", "Threading", "Profiling"],
   },
   {
-    title: "FoodHunt",
-    stack: ["React", "Express", "MongoDB", "Yelp API"],
-    summary:
-      "Tinder-style restaurant picker for friend groups, backed by Yelp recommendations and JWT-secured group sessions.",
-    outcome:
-      "50+ personalized recs and real-time votes so no one argues about dinner.",
-    href: "/projects/foodhunt",
+    label: "AI & automation",
+    items: [
+      "OpenAI API",
+      "Agent workflows",
+      "Prompt tooling",
+      "Eval dashboards",
+    ],
+  },
+  {
+    label: "Infra & delivery",
+    items: ["Docker", "Vercel", "Render", "Supabase / Auth"],
   },
 ];
 
-const coursework = [
-  "Data Structures",
-  "Algorithms",
-  "Advanced Web Technologies",
-  "Database Systems",
-  "Secure Software Design",
-  "Web Applications Security",
-];
-
-const skills = [
-  "JavaScript / TypeScript",
-  "Python (Pandas, NumPy)",
-  "C++ & Java",
-  "React / Next.js",
-  "Node.js / Express / Nest.js",
-  "Prisma / PostgreSQL / MongoDB",
-  "OpenAI + AI Agents",
-  "Git & Agile rituals",
-];
-
-const funNotes = [
-  "Scarsdale, NY native · I’m either in Newark, DE for school or back home visiting family.",
-  "Active Secret Clearance from SciTec work—comfortable around mission-critical reviews.",
-  "Actively interviewing for Entry-Level SWE roles.",
-];
-
-const contactLinks = [
-  { label: "GitHub", href: "https://github.com/bzlatin" },
-  { label: "LinkedIn", href: "https://www.linkedin.com/in/benjamin-zlatin/" },
-  { label: "Resume", href: "/Benjamin-Zlatin-Resume.pdf" },
-];
-
-const codePreview = `const currentFocus = [
-  "Scaling StudyGuider's AI summaries",
-  "Full-stack LMS (TanStack + Cloudflare Workers)",
-  "Building NLIP-compliant AI agents for IBM via the Enterprise Neurosystem group",
-];`;
-
-type AnimatedSectionProps = {
-  id?: string;
-  className?: string;
-  children: ReactNode;
-  alwaysVisible?: boolean;
+const sectionVariants = {
+  hidden: { opacity: 0, y: 80 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.9, ease: [0.16, 1, 0.3, 1] },
+  },
 };
 
-const AnimatedSection = ({
-  id,
-  className = "",
-  children,
-  alwaysVisible = false,
-}: AnimatedSectionProps) => {
-  const ref = useRef<HTMLElement | null>(null);
+const cardVariants = {
+  hidden: { opacity: 0, y: 32 },
+  visible: (index: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: index * 0.08,
+      duration: 0.6,
+      ease: [0.16, 1, 0.3, 1],
+    },
+  }),
+};
 
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-    if (alwaysVisible) {
-      node.classList.add("is-visible");
-      return;
-    }
+type SceneSectionProps = {
+  id: string;
+  children: ReactNode;
+  className?: string;
+};
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.2 }
-    );
-
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [alwaysVisible]);
-
-  const combinedClass = ["reveal-section", className].filter(Boolean).join(" ");
+const SceneSection = ({ id, children, className = "" }: SceneSectionProps) => {
+  const prefersReducedMotion = useReducedMotion();
+  const hidden = prefersReducedMotion ? { opacity: 0 } : sectionVariants.hidden;
+  const visible = prefersReducedMotion
+    ? { opacity: 1, transition: { duration: 0.3 } }
+    : sectionVariants.visible;
 
   return (
-    <section id={id} ref={ref} className={combinedClass}>
+    <motion.section
+      id={id}
+      initial='hidden'
+      whileInView='visible'
+      viewport={{ once: true, amount: 0.5 }}
+      variants={{ hidden, visible }}
+      className={[
+        "scene-section relative isolate flex scroll-mt-32 flex-col gap-5 rounded-[2.5rem] border border-white/10 bg-[rgba(5,6,22,0.92)] px-4 py-8 shadow-[0_40px_110px_rgba(2,3,12,0.7)] backdrop-blur-3xl sm:px-6 sm:py-9 lg:px-10 lg:py-11",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
       {children}
-    </section>
+    </motion.section>
   );
 };
 
-export default function Home() {
-  const [activeSection, setActiveSection] = useState(navLinks[0].href);
+const ParallaxHeading = ({
+  eyebrow,
+  title,
+  copy,
+}: {
+  eyebrow: string;
+  title: string;
+  copy: string;
+}) => {
+  const prefersReducedMotion = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+  const y = useTransform(
+    scrollYProgress,
+    [0, 1],
+    prefersReducedMotion ? [0, 0] : [32, -32]
+  );
 
-  useEffect(() => {
-    const sectionIds = navLinks.map((link) => link.href.replace("#", ""));
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visibleEntry = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+  return (
+    <div ref={ref} className='space-y-3'>
+      <motion.p
+        style={{ y }}
+        className='text-xs uppercase tracking-[0.45em] text-white/50'
+      >
+        {eyebrow}
+      </motion.p>
+      <motion.h2
+        style={{ y }}
+        className='glossy-title text-3xl font-semibold text-white sm:text-4xl'
+      >
+        {title}
+      </motion.h2>
+      <motion.p
+        style={{ y }}
+        className='max-w-2xl text-base text-white/75 sm:text-lg'
+      >
+        {copy}
+      </motion.p>
+    </div>
+  );
+};
 
-        if (visibleEntry?.target.id) {
-          setActiveSection(`#${visibleEntry.target.id}`);
+const ProjectCard = ({
+  project,
+  index,
+}: {
+  project: (typeof projects)[number];
+  index: number;
+}) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const handlePointer = (event: MouseEvent<HTMLDivElement>) => {
+    const node = cardRef.current;
+    if (!node) return;
+    const rect = node.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width - 0.5) * 4;
+    const y = ((event.clientY - rect.top) / rect.height - 0.5) * 4;
+    node.style.setProperty("--tilt-x", `${y}deg`);
+    node.style.setProperty("--tilt-y", `${x}deg`);
+  };
+
+  return (
+    <motion.article
+      ref={cardRef}
+      custom={index}
+      variants={cardVariants}
+      initial='hidden'
+      whileInView='visible'
+      viewport={{ once: true, amount: 0.4 }}
+      onMouseMove={handlePointer}
+      onMouseLeave={() => {
+        if (cardRef.current) {
+          cardRef.current.style.removeProperty("--tilt-x");
+          cardRef.current.style.removeProperty("--tilt-y");
         }
-      },
-      { threshold: 0.5, rootMargin: "-10% 0px -40% 0px" }
-    );
+      }}
+      className='project-card flex h-full flex-col gap-4 rounded-3xl border border-white/15 p-5 sm:p-6'
+    >
+      {/* Glass effect is handled via .project-card styles for the translucent blur. */}
+      <div className='space-y-1.5'>
+        <div className='flex items-center justify-between text-xs uppercase tracking-[0.3em] text-white/50'>
+          <span>{project.meta ?? "Shipped"}</span>
+          <span>Project</span>
+        </div>
+        <h3 className='text-2xl font-semibold text-white'>{project.title}</h3>
+        <p className='text-sm text-white/75'>{project.impact}</p>
+      </div>
+      <div className='flex flex-wrap gap-2 text-xs text-white/70'>
+        {project.stack.map((tech) => (
+          <span
+            key={tech}
+            className='rounded-full border border-white/15 px-3 py-1 tracking-wide'
+          >
+            {tech}
+          </span>
+        ))}
+      </div>
+      <div className='mt-auto pt-4'>
+        <Link
+          href={project.href}
+          target='_blank'
+          rel='noopener noreferrer'
+          className='glass-action inline-flex w-full items-center justify-between rounded-2xl border border-white/15 px-4 py-2.5 text-sm font-semibold text-white transition hover:border-white/35'
+        >
+          <span>Learn more</span>
+          <span aria-hidden className='text-lg'>
+            →
+          </span>
+        </Link>
+      </div>
+    </motion.article>
+  );
+};
 
-    sectionIds.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
+const ExperienceItem = ({
+  experience,
+  index,
+}: {
+  experience: (typeof experiences)[number];
+  index: number;
+}) => (
+  <motion.li
+    className='relative pl-10'
+    custom={index}
+    variants={cardVariants}
+    initial='hidden'
+    whileInView='visible'
+    viewport={{ once: true, amount: 0.4 }}
+  >
+    <span className='timeline-dot absolute left-0 top-2' aria-hidden />
+    <div className='rounded-2xl border border-white/10 bg-white/5 p-6'>
+      <div className='flex flex-wrap items-center justify-between gap-3'>
+        <div>
+          <h3 className='text-lg font-semibold text-white'>
+            {experience.role}
+          </h3>
+          <p className='text-sm text-white/65'>{experience.org}</p>
+        </div>
+        <p className='text-xs uppercase tracking-[0.3em] text-white/45'>
+          {experience.period}
+        </p>
+      </div>
+      <ul className='mt-4 space-y-2 text-sm text-white/75'>
+        {experience.bullets.map((bullet) => (
+          <li key={bullet}>{bullet}</li>
+        ))}
+      </ul>
+    </div>
+  </motion.li>
+);
 
-    return () => observer.disconnect();
-  }, []);
+const SkillGroupCard = ({
+  group,
+  index,
+}: {
+  group: (typeof skillGroups)[number];
+  index: number;
+}) => (
+  <motion.article
+    custom={index}
+    variants={cardVariants}
+    initial='hidden'
+    whileInView='visible'
+    viewport={{ once: true, amount: 0.4 }}
+    className='skill-group-card rounded-2xl border border-white/10 p-3 text-white sm:p-4'
+  >
+    {/* Skills section is grouped so recruiters can skim the actual tools I use. */}
+    <p className='text-xs uppercase tracking-[0.35em] text-white/50'>
+      {group.label}
+    </p>
+    <div className='mt-2 flex flex-wrap gap-1.5 text-sm text-white/80'>
+      {group.items.map((item) => (
+        <span
+          key={item}
+          className='rounded-full border border-white/15 px-3 py-1 text-xs'
+        >
+          {item}
+        </span>
+      ))}
+    </div>
+  </motion.article>
+);
 
-  const handleNavClick = (href: string) => {
+const MagneticLink = ({
+  children,
+  onClick,
+  prefersReducedMotion,
+}: {
+  children: ReactNode;
+  onClick: () => void;
+  prefersReducedMotion: boolean;
+}) => {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const reset = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  const handleMove = (event: MouseEvent<HTMLButtonElement>) => {
+    const node = event.currentTarget.getBoundingClientRect();
+    const moveX = event.clientX - (node.left + node.width / 2);
+    const moveY = event.clientY - (node.top + node.height / 2);
+    x.set(moveX * 0.15);
+    y.set(moveY * 0.15);
+  };
+
+  return (
+    <motion.button
+      type='button'
+      style={prefersReducedMotion ? undefined : { x, y }}
+      onMouseMove={prefersReducedMotion ? undefined : handleMove}
+      onMouseLeave={prefersReducedMotion ? undefined : reset}
+      onClick={onClick}
+      initial={prefersReducedMotion ? undefined : { opacity: 0, y: 12 }}
+      animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      className='cta-button inline-flex items-center gap-3 rounded-full border border-white px-6 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-white'
+    >
+      {children}
+      <span className='cta-arrow text-lg'>↓</span>
+    </motion.button>
+  );
+};
+
+const useScrollToId = () =>
+  useCallback((href: string) => {
     const target = document.querySelector(href);
     if (target) {
       target.scrollIntoView({ behavior: "smooth", block: "start" });
     }
+  }, []);
+
+const HeroSection = ({
+  scrollToSection,
+  prefersReducedMotion,
+}: {
+  scrollToSection: (href: string) => void;
+  prefersReducedMotion: boolean;
+}) => (
+  <section
+    id='hero'
+    className='relative grid min-h-[82vh] grid-cols-1 items-center gap-10 rounded-[3rem] border border-white/10 bg-[rgba(3,4,16,0.9)] px-4 py-10 shadow-[0_50px_150px_rgba(1,2,10,0.85)] backdrop-blur-3xl sm:min-h-[86vh] sm:px-8 sm:py-12 lg:min-h-[90vh] lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:px-12 lg:py-16'
+  >
+    <div className='flex flex-col justify-center space-y-5'>
+      <motion.p
+        className='inline-flex gap-2 text-sm uppercase tracking-[0.45em] text-white/70'
+        initial={prefersReducedMotion ? undefined : { opacity: 0.2 }}
+        animate={prefersReducedMotion ? undefined : { opacity: 1 }}
+        transition={{ duration: 1.2, ease: "easeOut" }}
+      >
+        <span className='hero-name-shimmer'>Ben Zlatin</span>
+      </motion.p>
+      <h1 className='text-5xl font-semibold text-white sm:text-6xl'>
+        I build fast, reliable software for real users.
+      </h1>
+      <p className='text-base text-white/75 sm:text-lg'>
+        Full-stack / systems / AI-adjacent. Senior CS @ University of Delaware.
+      </p>
+      <p className='text-sm text-white/60'>
+        Shipped work at SciTec, UD CIS, and campus projects that classmates use
+        daily.
+      </p>
+      <div className='flex flex-wrap gap-3 text-xs font-semibold uppercase tracking-[0.3em] text-white/65'>
+        {heroContacts.map((link) => (
+          <a
+            key={link.label}
+            href={link.href}
+            target='_blank'
+            rel='noopener noreferrer'
+            className='glow-chip rounded-full border border-white/15 px-4 py-2 text-white/80 transition hover:border-white hover:text-white'
+          >
+            {link.label}
+          </a>
+        ))}
+      </div>
+      <MagneticLink
+        onClick={() => scrollToSection("#projects")}
+        prefersReducedMotion={prefersReducedMotion}
+      >
+        See my work
+      </MagneticLink>
+    </div>
+    <div className='relative flex h-full items-center justify-center'>
+      {/* Hero portrait block highlighting the face as the focal visual. */}
+      <div className='hero-portrait relative flex h-[360px] w-full max-w-sm items-center justify-center self-center sm:h-[420px] sm:max-w-md lg:h-[520px] lg:max-w-full'>
+        <div className='hero-portrait__ambient' aria-hidden />
+        <div className='hero-portrait__ring'>
+          <Image
+            src='/headshot.jpg'
+            alt='Ben Zlatin portrait'
+            width={460}
+            height={520}
+            className='hero-portrait__img'
+            priority
+          />
+        </div>
+      </div>
+      <div
+        className='hero-glow pointer-events-none absolute inset-0 rounded-[2.75rem]'
+        aria-hidden
+      />
+      <div className='absolute bottom-10 flex flex-col items-center text-xs uppercase tracking-[0.4em] text-white/40'>
+        <div className='scroll-indicator' />
+        <span className='mt-3'>scroll</span>
+      </div>
+    </div>
+  </section>
+);
+
+const ProjectsSection = () => (
+  <SceneSection
+    id='projects'
+    className='section-accent section-accent--projects'
+  >
+    <ParallaxHeading
+      eyebrow='Selected work'
+      title='Projects with shipped impact.'
+      copy='Each build listed here solved a problem for classmates, teams, or paying users.'
+    />
+    <div className='grid gap-6 md:grid-cols-2'>
+      {projects.map((project, idx) => (
+        <ProjectCard key={project.title} project={project} index={idx} />
+      ))}
+    </div>
+  </SceneSection>
+);
+
+const ExperienceSection = () => (
+  <SceneSection
+    id='experience'
+    className='section-accent section-accent--experience'
+  >
+    <ParallaxHeading
+      eyebrow='Experience'
+      title='Roles and responsibility.'
+      copy='Short summaries that recruiters can scan quickly.'
+    />
+    <ol className='relative border-l border-white/15 pl-6'>
+      {experiences.map((experience, idx) => (
+        <ExperienceItem
+          key={experience.role}
+          experience={experience}
+          index={idx}
+        />
+      ))}
+    </ol>
+  </SceneSection>
+);
+
+const SkillsSection = () => (
+  <SceneSection id='skills'>
+    <ParallaxHeading
+      eyebrow='Tools'
+      title='Stacks I work in daily.'
+      copy='Grouped so you can see languages, frameworks, and platforms at a glance.'
+    />
+    <div className='grid gap-6 md:grid-cols-2'>
+      {skillGroups.map((group, idx) => (
+        <SkillGroupCard key={group.label} group={group} index={idx} />
+      ))}
+    </div>
+  </SceneSection>
+);
+
+const ContactSection = () => (
+  <SceneSection id='contact' className='items-center gap-4 text-center'>
+    <p className='text-xs uppercase tracking-[0.35em] text-white/50'>
+      Next role
+    </p>
+    <h2 className='text-3xl font-semibold text-white sm:text-4xl'>
+      Let’s talk.
+    </h2>
+    <p className='max-w-2xl text-sm text-white/75 sm:text-base'>
+      I care about clear code reviews, quick turnarounds, and shipping software
+      that holds up in production.
+    </p>
+    <div className='flex flex-wrap justify-center gap-4'>
+      <a
+        href='mailto:btzlatin@gmail.com'
+        target='_blank'
+        rel='noopener noreferrer'
+        className='glow-chip inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold uppercase tracking-[0.35em] text-slate-900 transition hover:bg-white/90'
+      >
+        Email
+      </a>
+      <a
+        href='https://www.linkedin.com/in/benjamin-zlatin/'
+        target='_blank'
+        rel='noopener noreferrer'
+        className='glow-chip inline-flex items-center gap-2 rounded-full border border-white/25 px-6 py-3 text-sm font-semibold uppercase tracking-[0.35em] text-white transition hover:border-white'
+      >
+        LinkedIn
+      </a>
+      <a
+        href='https://github.com/bzlatin'
+        target='_blank'
+        rel='noopener noreferrer'
+        className='glow-chip inline-flex items-center gap-2 rounded-full border border-white/25 px-6 py-3 text-sm font-semibold uppercase tracking-[0.35em] text-white transition hover:border-white'
+      >
+        GitHub
+      </a>
+    </div>
+  </SceneSection>
+);
+
+export default function Home() {
+  const prefersReducedMotion = useReducedMotion();
+  const scrollToSection = useScrollToId();
+  const [navOpen, setNavOpen] = useState(false);
+
+  const handleNavClick = (href: string) => {
+    scrollToSection(href);
+    setNavOpen(false);
   };
 
   return (
-    <div className='relative min-h-screen overflow-hidden page-shell'>
+    <div className='relative min-h-screen overflow-hidden bg-[#010209] text-white'>
       <div className='noise-overlay' aria-hidden />
-      <main className='relative mx-auto flex w-full max-w-7xl flex-col gap-14 px-4 pb-32 pt-6 sm:px-8 lg:px-12'>
-        <div className='grid-lines rounded-[40px]' aria-hidden />
-
-        <header className='site-header initial-visible'>
-          <div>
-            <p className='text-sm uppercase tracking-[0.4em] text-white/60'>
-              Benjamin Zlatin
-            </p>
-          </div>
-          <nav className='nav-links'>
+      <header className='fixed left-1/2 top-4 z-40 w-[min(1180px,94vw)] -translate-x-1/2 rounded-3xl border border-white/10 bg-black/65 px-4 py-3 shadow-[0_25px_70px_rgba(2,4,16,0.65)] backdrop-blur-2xl sm:px-6 sm:py-4'>
+        {/* Responsive nav scales typography on desktop and collapses cleanly on mobile. */}
+        <div className='flex items-center justify-between gap-3 text-[0.75rem] uppercase tracking-[0.3em] text-white/65'>
+          <p>Ben Zlatin</p>
+          <nav className='hidden items-center gap-2 lg:flex'>
             {navLinks.map((link) => (
               <button
                 key={link.href}
                 type='button'
                 onClick={() => handleNavClick(link.href)}
-                className={activeSection === link.href ? "is-active" : ""}
-                aria-current={activeSection === link.href ? "page" : undefined}
+                className='rounded-full border border-transparent px-4 py-2 transition hover:border-white/30 hover:text-white'
               >
                 {link.label}
               </button>
             ))}
           </nav>
-          <a className='link-pill' href='/Benjamin-Zlatin-Resume.pdf' download>
-            Resume ↗
+          <div className='flex items-center gap-2 lg:gap-3'>
+            <a
+              href='/Benjamin-Zlatin-Resume.pdf'
+              target='_blank'
+              rel='noopener noreferrer'
+              className='hidden rounded-full border border-white/20 px-4 py-2 text-xs font-semibold uppercase tracking-[0.35em] text-white transition hover:border-white lg:inline-flex'
+            >
+              Resume
+            </a>
+            <button
+              type='button'
+              onClick={() => setNavOpen((prev) => !prev)}
+              aria-label='Toggle navigation'
+              aria-expanded={navOpen}
+              className='inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/25 text-white lg:hidden'
+            >
+              <span className='sr-only'>Toggle navigation</span>
+              <svg viewBox='0 0 24 24' className='h-5 w-5' aria-hidden='true'>
+                <path
+                  d='M4 7h16M4 12h16M4 17h16'
+                  stroke='currentColor'
+                  strokeWidth={1.5}
+                  strokeLinecap='round'
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div
+          className={[
+            "flex-col gap-3 pt-4 text-xs uppercase tracking-[0.3em] text-white/70 transition-opacity lg:hidden",
+            navOpen ? "flex opacity-100" : "hidden opacity-0",
+          ].join(" ")}
+        >
+          {navLinks.map((link) => (
+            <button
+              key={link.href}
+              type='button'
+              onClick={() => handleNavClick(link.href)}
+              className='rounded-full border border-white/20 px-4 py-2 text-left'
+            >
+              {link.label}
+            </button>
+          ))}
+          <a
+            href='/Benjamin-Zlatin-Resume.pdf'
+            target='_blank'
+            rel='noopener noreferrer'
+            className='rounded-full border border-white/20 px-4 py-2 text-left'
+          >
+            Resume
           </a>
-        </header>
+        </div>
+      </header>
 
-        <AnimatedSection
-          id='hero'
-          className='glass-panel hero-panel relative overflow-hidden initial-visible'
-          alwaysVisible
-        >
-          <div className='hero-orb hero-orb--left' aria-hidden />
-          <div className='hero-orb hero-orb--right' aria-hidden />
-          <div className='hero-orb hero-orb--center' aria-hidden />
-          <div className='relative grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-center'>
-            <div className='space-y-7'>
-              <span className='section-eyebrow'>
-                CS @ University of Delaware · Seeking Summer 2026 SWE Roles
-              </span>
-              <h1 className='hero-title text-3xl font-semibold leading-tight sm:text-4xl lg:text-5xl'>
-                Hi, I’m Ben—full-stack engineer who likes fast systems, clear
-                UX, and proving ideas with code.
-              </h1>
-              <p className='section-subtitle'>
-                I’ve shipped missile-defense analytics, student-facing tooling,
-                and AI study apps. My favorite projects pair pragmatic
-                engineering with polish so teammates trust the work.
-              </p>
-              <div className='flex flex-wrap gap-3'>
-                <span className='link-pill'>Scarsdale ⇆ Newark, DE</span>
-                <a className='link-pill' href='tel:+19142687038'>
-                  914 • 268 • 7038
-                </a>
-                <a className='link-pill' href='mailto:btzlatin@gmail.com'>
-                  btzlatin@gmail.com
-                </a>
-              </div>
-              <div className='flex flex-wrap gap-3'>
-                {contactLinks.map((link) => (
-                  <a
-                    key={link.label}
-                    href={link.href}
-                    target='_blank'
-                    rel='noreferrer'
-                    className='inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-white'
-                  >
-                    {link.label} ↗
-                  </a>
-                ))}
-              </div>
-              <div id='about' className='about-card space-y-4'>
-                <div className='flex flex-wrap items-center gap-3'>
-                  <p className='section-eyebrow mb-0'>About</p>
-                  <span className='about-pill'>CS ’26 · UD</span>
-                  <span className='about-pill'>Enterprise Neurosystem</span>
-                </div>
-                <p className='text-white/80'>
-                  University of Delaware CS ’26. When I’m not coding I’m
-                  producing music, lifting, hiking, snowboarding, or wake
-                  surfing.
-                </p>
-                <div className='about-pills'>
-                  {coursework.map((course) => (
-                    <span key={course} className='about-pill'>
-                      {course}
-                    </span>
-                  ))}
-                </div>
-                <div className='grid gap-2 sm:grid-cols-2'>
-                  {funNotes.map((note) => (
-                    <p key={note} className='about-note'>
-                      {note}
-                    </p>
-                  ))}
-                </div>
-              </div>
-            </div>
-            <div className='space-y-8'>
-              <div className='avatar-ring mx-auto'>
-                <div className='avatar-ring__inner overflow-hidden'>
-                  <Image
-                    src='/headshot.jpg'
-                    alt='Benjamin Zlatin headshot'
-                    width={220}
-                    height={220}
-                    className='avatar-photo'
-                    priority
-                  />
-                </div>
-              </div>
-              <div className='code-panel p-4'>
-                <p className='text-xs uppercase tracking-[0.3em] text-white/60'>
-                  Current focus
-                </p>
-                <pre className='mt-3 text-sm leading-relaxed'>
-                  {codePreview}
-                </pre>
-              </div>
-              <div className='list-card text-white/80'>
-                <p className='text-xs uppercase tracking-[0.3em] text-white/60'>
-                  Contact
-                </p>
-                <p className='mt-3'>
-                  Email:{" "}
-                  <a href='mailto:btzlatin@gmail.com' className='text-white'>
-                    btzlatin@gmail.com
-                  </a>
-                </p>
-                <p>
-                  Phone:{" "}
-                  <a href='tel:+19142687038' className='text-white'>
-                    (914) 268-7038
-                  </a>
-                </p>
-              </div>
-            </div>
-          </div>
-        </AnimatedSection>
-
-        <AnimatedSection id='experience' className='section-card p-8 space-y-8'>
-          <div>
-            <p className='section-eyebrow'>Experience</p>
-            <h2 className='section-heading'>Internships & experiences.</h2>
-            <p className='section-subtitle'>
-              I gravitate toward problems where performance, reliability, and
-              empathy for the end user matter equally.
-            </p>
-          </div>
-          <div className='grid gap-6 md:grid-cols-2'>
-            {experiences.map((exp) => (
-              <article
-                key={exp.role}
-                className='rounded-2xl border border-white/12 bg-white/5 p-6'
-              >
-                <div className='flex flex-wrap items-center justify-between gap-2'>
-                  <div>
-                    <p className='text-lg font-semibold text-white'>
-                      {exp.role}
-                    </p>
-                    <p className='text-sm text-white/70'>{exp.org}</p>
-                  </div>
-                  <p className='text-xs uppercase tracking-[0.3em] text-white/60'>
-                    {exp.period}
-                  </p>
-                </div>
-                <ul className='mt-4 space-y-2 text-sm text-white/80'>
-                  {exp.bullets.map((bullet) => (
-                    <li key={bullet}>• {bullet}</li>
-                  ))}
-                </ul>
-              </article>
-            ))}
-          </div>
-        </AnimatedSection>
-
-        <AnimatedSection id='projects' className='section-card p-7 space-y-6'>
-          <div>
-            <p className='section-eyebrow'>Projects</p>
-            <h2 className='section-heading'>Build Log.</h2>
-            <p className='section-subtitle'>
-              StudyGuider, StarterHelpi, and FoodHunt taught me to ship quickly,
-              gather feedback in Discord, and keep the stack boring enough to
-              maintain.
-            </p>
-          </div>
-          <div className='grid gap-5 md:grid-cols-2 lg:grid-cols-3'>
-            {projects.map((project) => (
-              <article
-                key={project.title}
-                className='project-card flex flex-col gap-3'
-              >
-                <div className='flex items-center justify-between'>
-                  <h3 className='text-xl font-semibold text-white'>
-                    {project.title}
-                  </h3>
-                  <span className='text-xs uppercase tracking-[0.3em] text-white/60'>
-                    Build
-                  </span>
-                </div>
-                <p className='text-sm text-white/75'>{project.summary}</p>
-                <div className='flex flex-wrap gap-2 text-xs text-white/80'>
-                  {project.stack.map((tech) => (
-                    <span
-                      key={tech}
-                      className='rounded-full border border-white/15 px-3 py-1'
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-                <p className='text-sm text-white/60'>{project.outcome}</p>
-                {project.href && (
-                  <Link
-                    href={project.href}
-                    className='inline-flex w-fit items-center gap-2 rounded-full border border-white/30 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-white transition hover:border-white'
-                  >
-                    Learn More ↗
-                  </Link>
-                )}
-              </article>
-            ))}
-          </div>
-        </AnimatedSection>
-
-        <AnimatedSection
-          id='stats'
-          className='section-card grid gap-8 p-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]'
-        >
-          <div>
-            <p className='section-eyebrow'>Stats & toolbox</p>
-            <h2 className='section-heading'>Most Used Technologies.</h2>
-            <p className='section-subtitle'>
-              Performance mindsets, thorough documentation, and the obsession to
-              automate the boring parts.
-            </p>
-            <div className='mt-6 grid gap-4 md:grid-cols-2'>
-              {skills.map((skill) => (
-                <div key={skill} className='outline-card text-sm text-white/85'>
-                  {skill}
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className='space-y-4' />
-        </AnimatedSection>
-
-        <AnimatedSection
-          id='contact'
-          className='glass-panel overflow-hidden p-9 text-center sm:p-12'
-        >
-          <div className='relative mx-auto flex max-w-3xl flex-col gap-5'>
-            <p className='section-eyebrow'>Let’s talk</p>
-            <h2 className='section-heading'>
-              Looking for teams shipping thoughtful software.
-            </h2>
-            <p className='section-subtitle text-center'>
-              Reach out if you need someone who will write the PRD, ship the
-              feature, and stay up late to debug the edge cases. I care about
-              clear comms and stable releases.
-            </p>
-            <div className='flex flex-wrap justify-center gap-4'>
-              <a
-                href='mailto:btzlatin@gmail.com'
-                className='inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold uppercase tracking-wide text-slate-950 transition hover:opacity-90'
-              >
-                Email
-              </a>
-              <a
-                href='https://www.linkedin.com/in/benjamin-zlatin/'
-                target='_blank'
-                rel='noreferrer'
-                className='inline-flex items-center gap-2 rounded-full border border-white/30 px-6 py-3 text-sm font-semibold uppercase tracking-wide text-white transition hover:border-white'
-              >
-                LinkedIn
-              </a>
-              <a
-                href='https://github.com/bzlatin'
-                target='_blank'
-                rel='noreferrer'
-                className='inline-flex items-center gap-2 rounded-full border border-white/30 px-6 py-3 text-sm font-semibold uppercase tracking-wide text-white transition hover:border-white'
-              >
-                GitHub
-              </a>
-            </div>
-          </div>
-        </AnimatedSection>
+      <main className='relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-14 px-4 pb-28 pt-24 sm:px-6 sm:pb-32 sm:pt-28 lg:px-4'>
+        <HeroSection
+          scrollToSection={scrollToSection}
+          prefersReducedMotion={!!prefersReducedMotion}
+        />
+        <ProjectsSection />
+        <ExperienceSection />
+        <SkillsSection />
+        <ContactSection />
       </main>
     </div>
   );
