@@ -131,12 +131,14 @@ const skillGroups = [
   },
 ];
 
+const premiumEase: [number, number, number, number] = [0.16, 1, 0.3, 1];
+
 const sectionVariants = {
   hidden: { opacity: 0, y: 80 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.9, ease: [0.16, 1, 0.3, 1] },
+    transition: { duration: 0.9, ease: premiumEase },
   },
 };
 
@@ -148,7 +150,7 @@ const cardVariants = {
     transition: {
       delay: index * 0.08,
       duration: 0.6,
-      ease: [0.16, 1, 0.3, 1],
+      ease: premiumEase,
     },
   }),
 };
@@ -405,7 +407,7 @@ const MagneticLink = ({
       onClick={onClick}
       initial={prefersReducedMotion ? undefined : { opacity: 0, y: 12 }}
       animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.6, ease: premiumEase }}
       className='cta-button inline-flex items-center gap-3 rounded-full border border-white px-6 py-3 text-sm font-semibold uppercase tracking-[0.3em] text-white'
     >
       {children}
