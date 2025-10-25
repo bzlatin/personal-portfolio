@@ -560,7 +560,7 @@ const ContactSection = () => (
       Next role
     </p>
     <h2 className='text-3xl font-semibold text-white sm:text-4xl'>
-      Let’s build something reliable.
+      Let’s talk.
     </h2>
     <p className='max-w-2xl text-sm text-white/75 sm:text-base'>
       I care about clear code reviews, quick turnarounds, and shipping software
