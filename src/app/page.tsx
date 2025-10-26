@@ -446,7 +446,7 @@ const HeroSection = ({
         I build fast, reliable software for real users.
       </h1>
       <p className='text-base text-white/75 sm:text-lg'>
-        Full-stack / systems / AI-adjacent. Senior CS @ University of Delaware.
+        Full-stack Engineer / Senior CS @ University of Delaware.
       </p>
       <p className='text-sm text-white/60'>
         Shipped work at SciTec, UD CIS, and campus projects that classmates use
@@ -525,7 +525,7 @@ const ExperienceSection = () => (
     <ParallaxHeading
       eyebrow='Experience'
       title='Roles and responsibility.'
-      copy='Short summaries that recruiters can scan quickly.'
+      copy=''
     />
     <ol className='relative border-l border-white/15 pl-6'>
       {experiences.map((experience, idx) => (
@@ -541,11 +541,7 @@ const ExperienceSection = () => (
 
 const SkillsSection = () => (
   <SceneSection id='skills'>
-    <ParallaxHeading
-      eyebrow='Tools'
-      title='Stacks I work in daily.'
-      copy='Grouped so you can see languages, frameworks, and platforms at a glance.'
-    />
+    <ParallaxHeading eyebrow='Tools' title='Stacks I work in daily.' copy='' />
     <div className='grid gap-6 md:grid-cols-2'>
       {skillGroups.map((group, idx) => (
         <SkillGroupCard key={group.label} group={group} index={idx} />
