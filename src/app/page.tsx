@@ -11,7 +11,6 @@ import {
   type CSSProperties,
   type MouseEvent,
   type ReactNode,
-  type Ref,
 } from "react";
 import {
   motion,
@@ -160,8 +159,10 @@ const skillGroups = [
 
 const premiumEase: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
+type TextTag = "h1" | "p" | "span";
+
 type AnimatedTextProps = {
-  as?: "h1" | "p" | "span";
+  as?: TextTag;
   text: string;
   className?: string;
   delay?: number;
@@ -169,11 +170,6 @@ type AnimatedTextProps = {
   animate?: boolean;
   style?: CSSProperties;
 };
-
-type TextElement =
-  | HTMLHeadingElement
-  | HTMLParagraphElement
-  | HTMLSpanElement;
 
 const ReactBitsText = ({
   as = "p",
@@ -186,42 +182,31 @@ const ReactBitsText = ({
 }: AnimatedTextProps) => {
   const prefersReducedMotion = useReducedMotion();
   const [mounted, setMounted] = useState(false);
-  const Component = as;
+  const headingRef = useRef<HTMLHeadingElement | null>(null);
+  const paragraphRef = useRef<HTMLParagraphElement | null>(null);
+  const spanRef = useRef<HTMLSpanElement | null>(null);
+  const textRef =
+    as === "h1" ? headingRef : as === "p" ? paragraphRef : spanRef;
 
   useEffect(() => {
-    setMounted(true);
+    const frame = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(frame);
   }, []);
 
-  const textRef = useRef<TextElement | null>(null);
   const inView = useInView(textRef, { once: true, margin: "0px 0px -10% 0px" });
 
   const shouldAnimate = animate && mounted && !prefersReducedMotion;
-  if (!shouldAnimate) {
-    return (
-      <Component
-        ref={textRef as unknown as Ref<TextElement>}
-        className={className}
-        style={style}
-      >
-        {text}
-      </Component>
-    );
-  }
+  const words = shouldAnimate ? text.trim().split(/\s+/) : [];
 
-  const words = text.trim().split(/\s+/);
-
-  return (
-    <Component
-      ref={textRef as unknown as Ref<TextElement>}
-      className={className}
-      style={style}
-    >
-      {words.map((word, index) => (
+  const content = shouldAnimate
+    ? words.map((word, index) => (
         <Fragment key={`${word}-${index}-anim`}>
           <span className='inline-block overflow-hidden align-baseline'>
             <motion.span
               initial={{ y: "100%", opacity: 0 }}
-              animate={inView ? { y: 0, opacity: 1 } : { y: "100%", opacity: 0 }}
+              animate={
+                inView ? { y: 0, opacity: 1 } : { y: "100%", opacity: 0 }
+              }
               transition={{
                 duration: 0.6,
                 ease: premiumEase,
@@ -234,8 +219,29 @@ const ReactBitsText = ({
           </span>
           {index < words.length - 1 ? " " : null}
         </Fragment>
-      ))}
-    </Component>
+      ))
+    : text;
+
+  if (as === "h1") {
+    return (
+      <h1 ref={headingRef} className={className} style={style}>
+        {content}
+      </h1>
+    );
+  }
+
+  if (as === "span") {
+    return (
+      <span ref={spanRef} className={className} style={style}>
+        {content}
+      </span>
+    );
+  }
+
+  return (
+    <p ref={paragraphRef} className={className} style={style}>
+      {content}
+    </p>
   );
 };
 
