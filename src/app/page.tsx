@@ -3,14 +3,19 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
+  Fragment,
   useCallback,
+  useEffect,
   useRef,
   useState,
+  type CSSProperties,
   type MouseEvent,
   type ReactNode,
+  type Ref,
 } from "react";
 import {
   motion,
+  useInView,
   useMotionValue,
   useReducedMotion,
   useScroll,
@@ -30,6 +35,28 @@ const heroContacts = [
   { label: "LinkedIn", href: "https://www.linkedin.com/in/benjamin-zlatin/" },
   { label: "Email", href: "mailto:btzlatin@gmail.com" },
 ];
+
+function useIsMobile(breakpoint = 768) {
+  const [state, setState] = useState(() => {
+    if (typeof window === "undefined") {
+      return { isMobile: false, isReady: false };
+    }
+
+    return { isMobile: window.innerWidth < breakpoint, isReady: true };
+  });
+
+  useEffect(() => {
+    const updateIsMobile = () =>
+      setState({ isMobile: window.innerWidth < breakpoint, isReady: true });
+
+    updateIsMobile();
+    window.addEventListener("resize", updateIsMobile);
+
+    return () => window.removeEventListener("resize", updateIsMobile);
+  }, [breakpoint]);
+
+  return state;
+}
 
 const projects = [
   {
@@ -133,6 +160,85 @@ const skillGroups = [
 
 const premiumEase: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
+type AnimatedTextProps = {
+  as?: "h1" | "p" | "span";
+  text: string;
+  className?: string;
+  delay?: number;
+  wordDelay?: number;
+  animate?: boolean;
+  style?: CSSProperties;
+};
+
+type TextElement =
+  | HTMLHeadingElement
+  | HTMLParagraphElement
+  | HTMLSpanElement;
+
+const ReactBitsText = ({
+  as = "p",
+  text,
+  className = "",
+  delay = 0,
+  wordDelay = 0.05,
+  animate = true,
+  style,
+}: AnimatedTextProps) => {
+  const prefersReducedMotion = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
+  const Component = as;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const textRef = useRef<TextElement | null>(null);
+  const inView = useInView(textRef, { once: true, margin: "0px 0px -10% 0px" });
+
+  const shouldAnimate = animate && mounted && !prefersReducedMotion;
+  if (!shouldAnimate) {
+    return (
+      <Component
+        ref={textRef as unknown as Ref<TextElement>}
+        className={className}
+        style={style}
+      >
+        {text}
+      </Component>
+    );
+  }
+
+  const words = text.trim().split(/\s+/);
+
+  return (
+    <Component
+      ref={textRef as unknown as Ref<TextElement>}
+      className={className}
+      style={style}
+    >
+      {words.map((word, index) => (
+        <Fragment key={`${word}-${index}-anim`}>
+          <span className='inline-block overflow-hidden align-baseline'>
+            <motion.span
+              initial={{ y: "100%", opacity: 0 }}
+              animate={inView ? { y: 0, opacity: 1 } : { y: "100%", opacity: 0 }}
+              transition={{
+                duration: 0.6,
+                ease: premiumEase,
+                delay: delay + index * wordDelay,
+              }}
+              className='inline-block will-change-transform'
+            >
+              {word}
+            </motion.span>
+          </span>
+          {index < words.length - 1 ? " " : null}
+        </Fragment>
+      ))}
+    </Component>
+  );
+};
+
 const sectionVariants = {
   hidden: { opacity: 0, y: 80 },
   visible: {
@@ -197,6 +303,7 @@ const ParallaxHeading = ({
   copy: string;
 }) => {
   const prefersReducedMotion = useReducedMotion();
+  const { isMobile, isReady } = useIsMobile();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -207,6 +314,7 @@ const ParallaxHeading = ({
     [0, 1],
     prefersReducedMotion ? [0, 0] : [32, -32]
   );
+  const allowCopyAnimation = isReady && !isMobile && !prefersReducedMotion;
 
   return (
     <div ref={ref} className='space-y-3'>
@@ -222,12 +330,19 @@ const ParallaxHeading = ({
       >
         {title}
       </motion.h2>
-      <motion.p
-        style={{ y }}
-        className='max-w-2xl text-base text-white/75 sm:text-lg'
-      >
-        {copy}
-      </motion.p>
+      {copy ? (
+        <motion.div style={{ y }}>
+          <ReactBitsText
+            key={`${title}-copy-${allowCopyAnimation ? "anim" : "static"}`}
+            as='p'
+            text={copy}
+            className='max-w-2xl text-base text-white/75 sm:text-lg'
+            animate={allowCopyAnimation}
+            delay={0.2}
+            wordDelay={0.045}
+          />
+        </motion.div>
+      ) : null}
     </div>
   );
 };
@@ -428,76 +543,96 @@ const HeroSection = ({
 }: {
   scrollToSection: (href: string) => void;
   prefersReducedMotion: boolean;
-}) => (
-  <section
-    id='hero'
-    className='relative grid min-h-[82vh] grid-cols-1 items-center gap-10 rounded-[3rem] border border-white/10 bg-[rgba(3,4,16,0.9)] px-4 py-10 shadow-[0_50px_150px_rgba(1,2,10,0.85)] backdrop-blur-3xl sm:min-h-[86vh] sm:px-8 sm:py-12 lg:min-h-[90vh] lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:px-12 lg:py-16'
-  >
-    <div className='flex flex-col justify-center space-y-5'>
-      <motion.p
-        className='inline-flex gap-2 text-sm uppercase tracking-[0.45em] text-white/70'
-        initial={prefersReducedMotion ? undefined : { opacity: 0.2 }}
-        animate={prefersReducedMotion ? undefined : { opacity: 1 }}
-        transition={{ duration: 1.2, ease: "easeOut" }}
-      >
-        <span className='hero-name-shimmer'>Ben Zlatin</span>
-      </motion.p>
-      <h1 className='text-5xl font-semibold text-white sm:text-6xl'>
-        I build fast, reliable software for real users.
-      </h1>
-      <p className='text-base text-white/75 sm:text-lg'>
-        Full-stack Engineer / Senior CS @ University of Delaware.
-      </p>
-      <p className='text-sm text-white/60'>
-        Shipped work at SciTec, UD CIS, and campus projects that classmates use
-        daily.
-      </p>
-      <div className='flex flex-wrap gap-3 text-xs font-semibold uppercase tracking-[0.3em] text-white/65'>
-        {heroContacts.map((link) => (
-          <a
-            key={link.label}
-            href={link.href}
-            target='_blank'
-            rel='noopener noreferrer'
-            className='glow-chip rounded-full border border-white/15 px-4 py-2 text-white/80 transition hover:border-white hover:text-white'
-          >
-            {link.label}
-          </a>
-        ))}
+}) => {
+  const { isMobile, isReady } = useIsMobile();
+  const allowTextAnimation = isReady && !isMobile && !prefersReducedMotion;
+
+  return (
+    <section
+      id='hero'
+      className='relative grid min-h-[82vh] grid-cols-1 items-center gap-10 rounded-[3rem] border border-white/10 bg-[rgba(3,4,16,0.9)] px-4 py-10 shadow-[0_50px_150px_rgba(1,2,10,0.85)] backdrop-blur-3xl sm:min-h-[86vh] sm:px-8 sm:py-12 lg:min-h-[90vh] lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:px-12 lg:py-16'
+    >
+      <div className='flex flex-col justify-center space-y-5'>
+        <motion.p
+          className='inline-flex gap-2 text-sm uppercase tracking-[0.45em] text-white/70'
+          initial={prefersReducedMotion ? undefined : { opacity: 0.2 }}
+          animate={prefersReducedMotion ? undefined : { opacity: 1 }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
+        >
+          <span className='hero-name-shimmer'>Ben Zlatin</span>
+        </motion.p>
+        <ReactBitsText
+          key={`hero-title-${allowTextAnimation ? "anim" : "static"}`}
+          as='h1'
+          text='I build fast, reliable software for real users.'
+          className='text-5xl font-semibold text-white sm:text-6xl'
+          animate={allowTextAnimation}
+          delay={0.1}
+          wordDelay={0.06}
+        />
+        <ReactBitsText
+          key={`hero-sub-${allowTextAnimation ? "anim" : "static"}`}
+          text='Full-stack Engineer / Senior CS @ University of Delaware.'
+          className='text-base text-white/75 sm:text-lg'
+          animate={allowTextAnimation}
+          delay={0.45}
+          wordDelay={0.05}
+        />
+        <ReactBitsText
+          key={`hero-impact-${allowTextAnimation ? "anim" : "static"}`}
+          text='Shipped work at SciTec, UD CIS, and campus projects that classmates use daily.'
+          className='text-sm text-white/60'
+          animate={allowTextAnimation}
+          delay={0.7}
+          wordDelay={0.045}
+        />
+        <div className='flex flex-wrap gap-3 text-xs font-semibold uppercase tracking-[0.3em] text-white/65'>
+          {heroContacts.map((link) => (
+            <a
+              key={link.label}
+              href={link.href}
+              target='_blank'
+              rel='noopener noreferrer'
+              className='glow-chip rounded-full border border-white/15 px-4 py-2 text-white/80 transition hover:border-white hover:text-white'
+            >
+              {link.label}
+            </a>
+          ))}
+        </div>
+        <MagneticLink
+          onClick={() => scrollToSection("#projects")}
+          prefersReducedMotion={prefersReducedMotion}
+        >
+          See my work
+        </MagneticLink>
       </div>
-      <MagneticLink
-        onClick={() => scrollToSection("#projects")}
-        prefersReducedMotion={prefersReducedMotion}
-      >
-        See my work
-      </MagneticLink>
-    </div>
-    <div className='relative flex h-full items-center justify-center'>
-      {/* Hero portrait block highlighting the face as the focal visual. */}
-      <div className='hero-portrait relative flex h-[360px] w-full max-w-sm items-center justify-center self-center sm:h-[420px] sm:max-w-md lg:h-[520px] lg:max-w-full'>
-        <div className='hero-portrait__ambient' aria-hidden />
-        <div className='hero-portrait__ring'>
-          <Image
-            src='/headshot.jpg'
-            alt='Ben Zlatin portrait'
-            width={460}
-            height={520}
-            className='hero-portrait__img'
-            priority
-          />
+      <div className='relative flex h-full items-center justify-center'>
+        {/* Hero portrait block highlighting the face as the focal visual. */}
+        <div className='hero-portrait relative flex h-[360px] w-full max-w-sm items-center justify-center self-center sm:h-[420px] sm:max-w-md lg:h-[520px] lg:max-w-full'>
+          <div className='hero-portrait__ambient' aria-hidden />
+          <div className='hero-portrait__ring'>
+            <Image
+              src='/headshot.jpg'
+              alt='Ben Zlatin portrait'
+              width={460}
+              height={520}
+              className='hero-portrait__img'
+              priority
+            />
+          </div>
+        </div>
+        <div
+          className='hero-glow pointer-events-none absolute inset-0 rounded-[2.75rem]'
+          aria-hidden
+        />
+        <div className='absolute bottom-10 flex flex-col items-center text-xs uppercase tracking-[0.4em] text-white/40'>
+          <div className='scroll-indicator' />
+          <span className='mt-3'>scroll</span>
         </div>
       </div>
-      <div
-        className='hero-glow pointer-events-none absolute inset-0 rounded-[2.75rem]'
-        aria-hidden
-      />
-      <div className='absolute bottom-10 flex flex-col items-center text-xs uppercase tracking-[0.4em] text-white/40'>
-        <div className='scroll-indicator' />
-        <span className='mt-3'>scroll</span>
-      </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 const ProjectsSection = () => (
   <SceneSection
