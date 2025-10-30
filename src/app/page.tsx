@@ -668,7 +668,7 @@ const ExperienceSection = () => (
       title='Roles and responsibility.'
       copy=''
     />
-    <ol className='relative border-l border-white/15 pl-6'>
+    <ol className='mb-6 relative border-l border-white/15 pl-6 space-y-4'>
       {experiences.map((experience, idx) => (
         <ExperienceItem
           key={experience.role}
