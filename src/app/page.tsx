@@ -59,6 +59,20 @@ function useIsMobile(breakpoint = 768) {
 
 const projects = [
   {
+    title: "Push / Pull",
+    impact:
+      "Fullstack mobile fitness platform enabling custom workouts, progress tracking, and group training.",
+    stack: [
+      "React Native",
+      "Express.js",
+      "PostgreSQL",
+      "OAuth",
+      "iOS & Android",
+    ],
+    href: "/projects/pushpull",
+    meta: "2025 · In Progress · Private Beta",
+  },
+  {
     title: "UD CIS Discord Bot",
     impact:
       "4,000+ students pull class schedules, calendars, and alerts inside Discord.",
