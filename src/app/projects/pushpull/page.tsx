@@ -125,6 +125,21 @@ export default function PushPullPage() {
             Currently in private beta testing. Public release coming soon.
           </p>
         </section>
+        <section className='detail-panel space-y-4 p-8'>
+          <p className='text-xs uppercase tracking-[0.35em] text-white/50'>
+            Links
+          </p>
+          <div className='flex flex-wrap gap-3'>
+            <Link
+              href='https://push-pull.app'
+              target='_blank'
+              rel='noopener noreferrer'
+              className='inline-flex items-center gap-2 rounded-full bg-white px-5 py-2 text-sm font-semibold text-slate-900'
+            >
+              Visit push-pull.app ↗
+            </Link>
+          </div>
+        </section>
 
         <Link
           href='/#projects'
