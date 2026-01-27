@@ -24,9 +24,10 @@ const build = [
 ];
 
 const outcome = [
-  "Currently in private beta testing with active user feedback incorporation.",
+  "Launched publicly on the App Store and reached 500+ users within two weeks of launch.",
   "Built complete tech stack independently, demonstrating fullstack mobile expertise.",
   "Designed scalable architecture supporting cross-platform deployment.",
+  "Iterating quickly based on real user feedback while expanding social training features.",
 ];
 
 export const metadata: Metadata = {
@@ -122,7 +123,8 @@ export default function PushPullPage() {
             Status
           </p>
           <p className='text-sm text-white/75'>
-            Currently in private beta testing. Public release coming soon.
+            Live on the App Store. Reached 500+ users within two weeks of launch,
+            and actively shipping updates based on user feedback.
           </p>
         </section>
         <section className='detail-panel space-y-4 p-8'>

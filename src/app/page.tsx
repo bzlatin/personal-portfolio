@@ -29,6 +29,8 @@ const navLinks = [
   { label: "Contact", href: "#contact" },
 ];
 
+const RESUME_URL = "/Benjamin%20Zlatin%27s%20Resume.pdf";
+
 const heroContacts = [
   { label: "GitHub", href: "https://github.com/bzlatin" },
   { label: "LinkedIn", href: "https://www.linkedin.com/in/benjamin-zlatin/" },
@@ -61,7 +63,7 @@ const projects = [
   {
     title: "Push / Pull",
     impact:
-      "Fullstack mobile fitness platform enabling custom workouts, progress tracking, and group training.",
+      "Fullstack mobile fitness platform for custom workouts + progress tracking—500+ users in the first two weeks on the App Store.",
     stack: [
       "React Native",
       "Express.js",
@@ -70,7 +72,7 @@ const projects = [
       "iOS & Android",
     ],
     href: "/projects/pushpull",
-    meta: "2025 · In Progress · Private Beta",
+    meta: "2025 · Live · App Store",
   },
   {
     title: "UD CIS Discord Bot",
@@ -332,7 +334,7 @@ const ParallaxHeading = ({
   const y = useTransform(
     scrollYProgress,
     [0, 1],
-    prefersReducedMotion ? [0, 0] : [32, -32]
+    prefersReducedMotion ? [0, 0] : [32, -32],
   );
   const allowCopyAnimation = isReady && !isMobile && !prefersReducedMotion;
 
@@ -777,7 +779,7 @@ export default function Home() {
           </nav>
           <div className='flex items-center gap-2 lg:gap-3'>
             <a
-              href='/Benjamin-Zlatin-Resume.pdf'
+              href={RESUME_URL}
               target='_blank'
               rel='noopener noreferrer'
               className='hidden rounded-full border border-white/20 px-4 py-2 text-xs font-semibold uppercase tracking-[0.35em] text-white transition hover:border-white lg:inline-flex'
@@ -820,7 +822,7 @@ export default function Home() {
             </button>
           ))}
           <a
-            href='/Benjamin-Zlatin-Resume.pdf'
+            href={RESUME_URL}
             target='_blank'
             rel='noopener noreferrer'
             className='rounded-full border border-white/20 px-4 py-2 text-left'
