@@ -29,8 +29,6 @@ const navLinks = [
   { label: "Contact", href: "#contact" },
 ];
 
-const RESUME_URL = "/Benjamin%20Zlatin%27s%20Resume.pdf";
-
 const heroContacts = [
   { label: "GitHub", href: "https://github.com/bzlatin" },
   { label: "LinkedIn", href: "https://www.linkedin.com/in/benjamin-zlatin/" },
@@ -778,14 +776,6 @@ export default function Home() {
             ))}
           </nav>
           <div className='flex items-center gap-2 lg:gap-3'>
-            <a
-              href={RESUME_URL}
-              target='_blank'
-              rel='noopener noreferrer'
-              className='hidden rounded-full border border-white/20 px-4 py-2 text-xs font-semibold uppercase tracking-[0.35em] text-white transition hover:border-white lg:inline-flex'
-            >
-              Resume
-            </a>
             <button
               type='button'
               onClick={() => setNavOpen((prev) => !prev)}
@@ -821,14 +811,6 @@ export default function Home() {
               {link.label}
             </button>
           ))}
-          <a
-            href={RESUME_URL}
-            target='_blank'
-            rel='noopener noreferrer'
-            className='rounded-full border border-white/20 px-4 py-2 text-left'
-          >
-            Resume
-          </a>
         </div>
       </header>
 
