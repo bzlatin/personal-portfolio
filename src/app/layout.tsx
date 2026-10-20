@@ -13,27 +13,20 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Benjamin Zlatin — CS Student & Software Engineer",
+  title: "Ben Zlatin — Software Engineer",
   description:
-    "University of Delaware CS '26 student crafting dependable web systems, AI-powered apps, and mission-ready tooling.",
+    "Software Engineer at Innovative Defense Technologies (IDT). Selected work in full-stack applications, systems performance, and AI tooling.",
   openGraph: {
-    title: "Benjamin Zlatin — CS Student & Software Engineer",
+    title: "Ben Zlatin — Software Engineer",
     description:
-      "University of Delaware CS '26 student crafting dependable web systems, AI-powered apps, and mission-ready tooling.",
-    url: "https://personal-portfolio.example",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-      },
-    ],
+      "Ben Zlatin is a software engineer at Innovative Defense Technologies (IDT). View his projects and engineering experience.",
+    type: "website",
   },
   twitter: {
-    card: "summary_large_image",
-    title: "Benjamin Zlatin — CS Student & Software Engineer",
+    card: "summary",
+    title: "Ben Zlatin — Software Engineer",
     description:
-      "University of Delaware CS '26 student crafting dependable web systems, AI-powered apps, and mission-ready tooling.",
+      "Software Engineer at Innovative Defense Technologies (IDT). Full-stack applications, systems performance, and AI tooling.",
   },
 };
 
@@ -44,7 +37,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         {children}
       </body>
     </html>
