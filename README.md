@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ben Zlatin — personal portfolio
 
-## Getting Started
+A Next.js 16 / React 19 portfolio with an editorial visual system, interactive SVG linework, and five engineering case studies.
 
-First, run the development server:
+## Development
 
-```bash
+```sh
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000. Production: `npm run build`, then `npm start`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Content and design
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `src/app/page.tsx`: homepage composition and current IDT role.
+- `src/data/home.ts`: preserved experience and skill content.
+- `src/data/projects.ts`: all five original project stories, technologies, outcomes, and links.
+- `src/components/project-detail.tsx`: shared case-study layout; original routes remain intact.
+- `src/components/signal-field.tsx`: keyboard-accessible Flow / Orbit / Wave study.
+- `src/app/globals.css`: responsive design tokens and styles.
+- `DESIGN.md`: visual direction, reusable patterns, motion, and content constraints.
+- `PRODUCT.md`: verified content and outstanding factual gaps.
 
-## Learn More
+The current role is Software Engineer at Innovative Defense Technologies, starting August 2026. No responsibilities have been inferred. A résumé asset is not present; “Request résumé” opens an email draft. Project graphics are abstract illustrations. StudyGuider is a side project built for exams and studying while at school. The senior design dates remain as supplied until updated by the owner.
 
-To learn more about Next.js, take a look at the following resources:
+## Validation
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```sh
+npm run lint
+npx tsc --noEmit
+npm run build
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Browser checks use externally installed Playwright and Chrome without adding runtime dependencies:
 
-## Deploy on Vercel
+```sh
+PLAYWRIGHT_MODULE=/absolute/path/to/playwright BASE_URL=http://127.0.0.1:3000 REVIEW_PASS=2 node scripts/verify-browser.mjs
+PLAYWRIGHT_MODULE=/absolute/path/to/playwright AXE_PATH=/absolute/path/to/axe.min.js BASE_URL=http://127.0.0.1:3000 node scripts/check-accessibility.mjs
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Set `CHROME_PATH` for a non-default Chrome installation. Screenshots and reports are saved under the Git-ignored `verification/` directory. Browser checks cover viewport overflow, all project routes, images, mobile menu and Escape focus, SVG controls, clipboard feedback, reduced motion, skip links, and content without JavaScript. The accessibility script checks all six pages at desktop and mobile widths.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Before deployment, optionally supply an actual résumé PDF and confirm the public deployment domain for canonical/social URLs. Confirm any changed project status or senior design end date before editing those facts.
